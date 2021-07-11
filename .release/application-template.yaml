@@ -1,0 +1,35 @@
+---
+app: elasticsearch-helm
+auto_deploy: true
+context: release-handsup-us-east-1
+domain: elasticsearch-helm.rls.sh
+mode: development
+repo_name: awesome-release/elasticsearch-helm
+environment_templates:
+- name: ephemeral
+- name: permanent
+resources:
+  cpu:
+    limits: 1000m
+    requests: 100m
+  memory:
+    limits: 1Gi
+    requests: 100Mi
+  replicas: 1
+charts:
+- name: elasticsearch
+  add: elastic
+  repo_url: https://helm.elastic.co
+  directory: elasticsearch
+  values: values.yaml
+workflows:
+- name: setup
+  parallelize:
+  - step: elasticsearch
+    tasks:
+    - charts.elasticsearch
+- name: patch
+  parallelize:
+  - step: elasticsearch
+    tasks:
+    - charts.elasticsearch
